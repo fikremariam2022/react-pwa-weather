@@ -1,19 +1,20 @@
 const CACHE_NAME = "version-1";
-const urlsToCache = ["./index.html", "./offline.html"];
+const urlsToCache = ["index.html", "offline.html"];
 
 const self = this;
 
-//install sw
+// Install SW
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("opened cache");
+      console.log("Opened cache");
+
       return cache.addAll(urlsToCache);
     })
   );
 });
 
-//listen requests
+// Listen for requests
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.match(event.request).then(() => {
@@ -22,20 +23,18 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-//activate sw
+// Activate the SW
 self.addEventListener("activate", (event) => {
-  const cacheWhiteList = [];
-  cacheWhiteList.push(urlsToCache);
-  console.log("caches", caches);
+  const cacheWhitelist = [];
+  cacheWhitelist.push(CACHE_NAME);
 
   event.waitUntil(
     caches.keys().then((cacheNames) =>
       Promise.all(
         cacheNames.map((cacheName) => {
-          if (!cacheWhiteList.includes(cacheName)) {
+          if (!cacheWhitelist.includes(cacheName)) {
             return caches.delete(cacheName);
           }
-          return cacheName;
         })
       )
     )
